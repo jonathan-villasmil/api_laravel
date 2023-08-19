@@ -8,6 +8,12 @@ use App\Http\Requests\UpdateCategoryRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\CategoryCollection;
 use App\Http\Resources\Api\CategoryResource;
+use App\Filters\Api\CategoriesFilter;
+use Illuminate\Http\Request;
+
+
+
+
 
 
 
@@ -17,8 +23,21 @@ class CategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $filter = new CategoriesFilter();
+        $queryItems = $filter->transform($request);   //[['column', 'operator', 'value']]
+
+        if(count($queryItems) == 0){
+             return new CategoryCollection(Category::paginate());
+        }else{
+            $categories = Category::where($queryItems)->paginate();
+             return new CategoryCollection($categories->appends($request->query()));
+
+        }
+
+        // Category::where($queryItems);
+
         return new CategoryCollection(Category::paginate());
     }
 
@@ -35,7 +54,7 @@ class CategoryController extends Controller
      */
     public function store(StoreCategoryRequest $request)
     {
-        //
+        // validar que el nombre no exista en la db
     }
 
     /**

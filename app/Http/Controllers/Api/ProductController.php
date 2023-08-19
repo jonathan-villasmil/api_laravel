@@ -8,18 +8,30 @@ use App\Http\Requests\UpdateProductRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\ProductCollection;
 use App\Http\Resources\Api\ProductResource;
-
-
-
+use App\Filters\Api\ProductsFilter;
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        return new ProductCollection(Product::paginate());
+    public function index(Request $request)
+    {   
+        $filter = new ProductsFilter();
+        $queryItems = $filter->transform($request);   //[['column', 'operator', 'value']]
+
+        if(count($queryItems) == 0){
+            return new ProductCollection(Product::paginate());
+        }else{
+            $products = Product::where($queryItems)->paginate();
+            return new ProductCollection($products->appends($request->query()));
+
+        }
+
+        Product::where($queryItems);
+
+        // return new ProductCollection(Product::paginate());
     }
 
     /**
@@ -35,7 +47,7 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
-        //
+        // validar que el nombre no exista en la db
     }
 
     /**

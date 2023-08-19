@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->longText('description')->nullable();
-            $table->decimal('purchase_price');
-            $table->decimal('selling_price');
+            $table->decimal('purchase_price', 10, 2);
+            $table->decimal('selling_price', 10, 2);
             $table->integer('quantity');
             
              // Agregar la columna para la relación con categorías
